@@ -1,6 +1,6 @@
 # Bracket Fluent
 
-Helper for the [bracket][] template engine that integrated with [project fluent][] using the loaders provided by [fluent templates][].
+Helper for the [bracket][] template engine that integrates with [project fluent][] using the loaders provided by [fluent templates][].
 
 ## Examples
 

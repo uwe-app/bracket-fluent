@@ -9,7 +9,7 @@ license = "MIT OR Apache-2.0"
 readme = "README.md"
 
 [dependencies]
-bracket = "^0.5.9"
+bracket = "^0.5.10"
 fluent-templates = "^0.5.16"
 serde_json = "^1.0"
 
