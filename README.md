@@ -1,6 +1,6 @@
 # Bracket Fluent
 
-Fluent helper for the [bracket][] template engine.
+Helper for the [bracket][] template engine that integrated with [project fluent][] using the loaders provided by [fluent templates][].
 
 ## Examples
 
@@ -12,3 +12,5 @@ cargo run --example=arc
 ```
 
 [bracket]: https://github.com/uwe-app/bracket
+[project fluent]: https://www.projectfluent.org/
+[fluent templates]: https://docs.rs/fluent-templates
