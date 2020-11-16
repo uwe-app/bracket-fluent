@@ -12,15 +12,16 @@ use bracket::{
 
 use serde_json::json;
 
-use fluent_templates::ArcLoader;
 use bracket_fluent::Fluent;
+use fluent_templates::ArcLoader;
 
 fn load() -> Box<ArcLoader> {
-    let loader = ArcLoader::builder("examples/locales/", unic_langid::langid!("en"))
-        .shared_resources(Some(&["examples/locales/core.ftl".into()]))
-        .customize(|bundle| bundle.set_use_isolating(false))
-        .build()
-        .unwrap();
+    let loader =
+        ArcLoader::builder("examples/locales/", unic_langid::langid!("en"))
+            .shared_resources(Some(&["examples/locales/core.ftl".into()]))
+            .customize(|bundle| bundle.set_use_isolating(false))
+            .build()
+            .unwrap();
 
     Box::new(loader)
 }
@@ -41,8 +42,9 @@ fn render() -> Result<String> {
 
     let loader = load();
 
-    registry.helpers_mut()
-        .insert("fluent", Box::new(Fluent::new(loader)));
+    registry
+        .helpers_mut()
+        .insert("fluent", Box::new(Fluent::new(loader, true)));
 
     registry.render(name, &data)
 }

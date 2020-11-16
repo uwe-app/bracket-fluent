@@ -36,8 +36,9 @@ fn render() -> Result<String> {
     let templates = Templates::try_from(&loader)?;
     let mut registry = Registry::from(templates);
 
-    registry.helpers_mut()
-        .insert("fluent", Box::new(Fluent::new(Box::new(&*LOCALES))));
+    registry
+        .helpers_mut()
+        .insert("fluent", Box::new(Fluent::new(Box::new(&*LOCALES)), true));
 
     registry.render(name, &data)
 }
