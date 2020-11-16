@@ -83,14 +83,14 @@ impl Helper for FluentHelper {
         let lang = rc
             .evaluate("@root.lang")?
             .ok_or_else(|| {
-                HelperError::Message(format!(
+                HelperError::new(format!(
                     "Helper '{}' requires a 'lang' variable in the template data",
                     ctx.name()
                 ))
             })?
             .as_str()
             .ok_or_else(|| {
-                HelperError::Message(format!(
+                HelperError::new(format!(
                     "Type error in helper '{}' the 'lang' variable must be a string",
                     ctx.name()
                 ))
@@ -142,7 +142,6 @@ impl Helper for FluentHelper {
 
             let params = args.get_or_insert(HashMap::new());
             for (k, v) in map {
-                //println!("Got value {:?}", &v);
                 params.insert(k, FluentValue::String(v.into()));
             }
         }
