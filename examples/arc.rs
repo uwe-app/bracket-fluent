@@ -12,7 +12,7 @@ use bracket::{
 
 use serde_json::json;
 
-use bracket_fluent::Fluent;
+use bracket_fluent::FluentHelper;
 use fluent_templates::ArcLoader;
 
 fn load() -> Box<ArcLoader> {
@@ -44,7 +44,7 @@ fn render() -> Result<String> {
 
     registry
         .helpers_mut()
-        .insert("fluent", Box::new(Fluent::new(loader, true)));
+        .insert("fluent", Box::new(FluentHelper::new(loader, true, true)));
 
     registry.render(name, &data)
 }

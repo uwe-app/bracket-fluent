@@ -1,5 +1,4 @@
 //! Helper for fluent language lookup.
-use std::borrow::Cow;
 use std::collections::HashMap;
 
 use bracket::{
@@ -15,26 +14,36 @@ use fluent_templates::fluent_bundle::FluentValue;
 use fluent_templates::LanguageIdentifier;
 use fluent_templates::Loader;
 
+static FLUENT_PARAM: &str = "fluentparam";
+
 /// Lookup a language string in the underlying loader.
-pub struct Fluent {
+pub struct FluentHelper {
     loader: Box<dyn Loader + Send + Sync>,
+    escaped: bool,
     trim: bool,
 }
 
-impl Fluent {
-
+impl FluentHelper {
     /// Create a new fluent helper.
     ///
     /// Messages are resolved using the underlying loader.
     ///
-    /// When `trim` is `true` then parameters passed in using `fluentparam` child 
+    /// When `trim` is `true` then parameters passed in using `fluentparam` child
     /// blocks have leading and trailing whitespace removed.
-    pub fn new(loader: Box<dyn Loader + Send + Sync>, trim: bool) -> Self {
-        Self { loader, trim }
+    pub fn new(
+        loader: Box<dyn Loader + Send + Sync>,
+        escaped: bool,
+        trim: bool,
+    ) -> Self {
+        Self {
+            loader,
+            escaped,
+            trim,
+        }
     }
 }
 
-impl Helper for Fluent {
+impl Helper for FluentHelper {
     fn call<'render, 'call>(
         &self,
         rc: &mut Render<'render>,
@@ -49,14 +58,14 @@ impl Helper for Fluent {
             .evaluate("@root.lang")?
             .ok_or_else(|| {
                 HelperError::Message(format!(
-                    "Helper '{}' requires a 'lang' variable in the root data",
+                    "Helper '{}' requires a 'lang' variable in the template data",
                     ctx.name()
                 ))
             })?
             .as_str()
             .ok_or_else(|| {
                 HelperError::Message(format!(
-                    "Helper '{}' requires that the 'lang' variable is a string",
+                    "Type error in helper '{}' the 'lang' variable must be a string",
                     ctx.name()
                 ))
             })?;
@@ -91,8 +100,8 @@ impl Helper for Fluent {
                         if let Some("fluentparam") = block.name() {
                             let content = rc.buffer(child)?;
                             let param = block.call().arguments().get(0).ok_or_else(|| {
-                                HelperError::Message(
-                                    format!("Block 'fluentparam' must have a single argument")
+                                HelperError::new(
+                                    format!("Block '{}' must have a single argument", FLUENT_PARAM)
                                 )
                             })?;
 
@@ -102,31 +111,29 @@ impl Helper for Fluent {
                                         args.get_or_insert(HashMap::new());
 
                                     let value = if self.trim {
-                                        Cow::from(content.trim().to_string())
+                                        content.trim().to_string()
                                     } else {
-                                        Cow::from(content)
+                                        content
                                     };
-
-                                    println!("Parameter value {:?}", value);
 
                                     params.insert(
                                         s.to_string(),
-                                        FluentValue::String(value),
+                                        FluentValue::String(value.into()),
                                     );
                                 } else {
-                                    return Err(HelperError::Message(
-                                        format!("Block 'fluentparam' expects a string argument")
+                                    return Err(HelperError::new(
+                                        format!("Block '{}' expects a string argument", FLUENT_PARAM)
                                     ));
                                 }
                             } else {
-                                return Err(HelperError::Message(
-                                    format!("Block 'fluentparam' expects a JSON literal argument")
+                                return Err(HelperError::new(
+                                    format!("Block '{}' expects a JSON literal argument", FLUENT_PARAM)
                                 ));
                             }
                         } else {
-                            return Err(HelperError::Message(format!(
-                                "Helper '{}' only allows 'fluentparam' blocks",
-                                ctx.name()
+                            return Err(HelperError::new(format!(
+                                "Helper '{}' only allows '{}' blocks",
+                                ctx.name(), FLUENT_PARAM
                             )));
                         }
                     }
@@ -137,12 +144,16 @@ impl Helper for Fluent {
 
         let lang_id = lang
             .parse::<LanguageIdentifier>()
-            .map_err(|e| HelperError::Message(e.to_string()))?;
+            .map_err(|e| HelperError::new(e.to_string()))?;
 
         let message =
             self.loader
                 .lookup_complete(&lang_id, &msg_id, args.as_ref());
-        rc.write_escaped(&message)?;
+        if self.escaped {
+            rc.write_escaped(&message)?;
+        } else {
+            rc.write(&message)?;
+        }
 
         Ok(None)
     }

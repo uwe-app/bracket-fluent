@@ -12,7 +12,7 @@ use bracket::{
 
 use serde_json::json;
 
-use bracket_fluent::Fluent;
+use bracket_fluent::FluentHelper;
 
 fluent_templates::static_loader! {
     static LOCALES = {
@@ -36,9 +36,10 @@ fn render() -> Result<String> {
     let templates = Templates::try_from(&loader)?;
     let mut registry = Registry::from(templates);
 
-    registry
-        .helpers_mut()
-        .insert("fluent", Box::new(Fluent::new(Box::new(&*LOCALES)), true));
+    registry.helpers_mut().insert(
+        "fluent",
+        Box::new(FluentHelper::new(Box::new(&*LOCALES), true, true)),
+    );
 
     registry.render(name, &data)
 }
