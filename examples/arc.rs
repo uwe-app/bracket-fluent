@@ -15,21 +15,18 @@ use serde_json::json;
 use bracket_fluent::FluentHelper;
 use fluent_templates::ArcLoader;
 
-fn load() -> Box<ArcLoader> {
-    let loader =
-        ArcLoader::builder("examples/locales/", unic_langid::langid!("en"))
-            .shared_resources(Some(&["examples/locales/core.ftl".into()]))
-            .customize(|bundle| bundle.set_use_isolating(false))
-            .build()
-            .unwrap();
-
-    Box::new(loader)
+fn load() -> ArcLoader {
+    ArcLoader::builder("examples/locales/", unic_langid::langid!("en"))
+        .shared_resources(Some(&["examples/locales/core.ftl".into()]))
+        .customize(|bundle| bundle.set_use_isolating(false))
+        .build()
+        .unwrap()
 }
 
 fn render() -> Result<String> {
     let name = "examples/fluent.md";
     let data = json!({
-        "title": "Fluent Example",
+        "title": "Fluent Example (Arc Loader)",
         //"lang": "en",
         "lang": "fr",
     });
@@ -44,7 +41,7 @@ fn render() -> Result<String> {
 
     registry
         .helpers_mut()
-        .insert("fluent", Box::new(FluentHelper::new(loader, true, true)));
+        .insert("fluent", Box::new(FluentHelper::new(Box::new(loader))));
 
     registry.render(name, &data)
 }
@@ -52,10 +49,8 @@ fn render() -> Result<String> {
 fn main() {
     std::env::set_var("RUST_LOG", "info");
     pretty_env_logger::init();
-
     match render() {
         Ok(result) => println!("{}", result),
-        // NOTE: Use Debug to print errors with source code snippets
         Err(e) => log::error!("{:?}", e),
     }
 }

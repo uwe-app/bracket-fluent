@@ -25,9 +25,9 @@ fluent_templates::static_loader! {
 fn render() -> Result<String> {
     let name = "examples/fluent.md";
     let data = json!({
-        "title": "Fluent Example",
-        //"lang": "en",
-        "lang": "fr",
+        "title": "Fluent Example (Static Loader)",
+        "lang": "en",
+        //"lang": "fr",
     });
 
     let mut loader = Loader::new();
@@ -36,10 +36,9 @@ fn render() -> Result<String> {
     let templates = Templates::try_from(&loader)?;
     let mut registry = Registry::from(templates);
 
-    registry.helpers_mut().insert(
-        "fluent",
-        Box::new(FluentHelper::new(Box::new(&*LOCALES), true, true)),
-    );
+    registry
+        .helpers_mut()
+        .insert("fluent", Box::new(FluentHelper::new(Box::new(&*LOCALES))));
 
     registry.render(name, &data)
 }
@@ -47,10 +46,8 @@ fn render() -> Result<String> {
 fn main() {
     std::env::set_var("RUST_LOG", "trace");
     pretty_env_logger::init();
-
     match render() {
         Ok(result) => println!("{}", result),
-        // NOTE: Use Debug to print errors with source code snippets
         Err(e) => log::error!("{:?}", e),
     }
 }
