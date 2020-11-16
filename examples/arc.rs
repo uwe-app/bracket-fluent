@@ -15,14 +15,6 @@ use serde_json::json;
 use bracket_fluent::FluentHelper;
 use fluent_templates::ArcLoader;
 
-fn load() -> ArcLoader {
-    ArcLoader::builder("examples/locales/", unic_langid::langid!("en"))
-        .shared_resources(Some(&["examples/locales/core.ftl".into()]))
-        .customize(|bundle| bundle.set_use_isolating(false))
-        .build()
-        .unwrap()
-}
-
 fn render() -> Result<String> {
     let name = "examples/fluent.md";
     let data = json!({
@@ -37,7 +29,12 @@ fn render() -> Result<String> {
     let templates = Templates::try_from(&loader)?;
     let mut registry = Registry::from(templates);
 
-    let loader = load();
+    let loader = 
+        ArcLoader::builder("examples/locales/", unic_langid::langid!("en"))
+            .shared_resources(Some(&["examples/locales/core.ftl".into()]))
+            //.customize(|bundle| bundle.set_use_isolating(false))
+            .build()
+            .unwrap();
 
     registry
         .helpers_mut()
