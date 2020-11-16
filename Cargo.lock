@@ -59,8 +59,10 @@ version = "0.1.0"
 dependencies = [
  "bracket",
  "fluent-templates",
+ "log",
  "pretty_env_logger",
  "serde_json",
+ "unic-langid",
 ]
 
 [[package]]

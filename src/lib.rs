@@ -18,6 +18,12 @@ pub struct Fluent {
     loader: Box<dyn Loader + Send + Sync>,
 }
 
+impl Fluent {
+    pub fn new(loader: Box<dyn Loader + Send + Sync>) -> Self {
+        Self {loader} 
+    }
+}
+
 impl Helper for Fluent {
     fn call<'render, 'call>(
         &self,
@@ -29,7 +35,8 @@ impl Helper for Fluent {
 
         let msg_id = ctx.try_get(0, &[Type::String])?.as_str().unwrap();
 
-        let lang = rc.evaluate("@root.lang")?
+        let lang = rc
+            .evaluate("@root.lang")?
             .ok_or_else(|| {
                 HelperError::Message(
                     format!("Helper '{}' requires a 'lang' variable in the root data", ctx.name()))
