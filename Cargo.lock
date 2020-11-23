@@ -40,9 +40,9 @@ checksum = "474a626a67200bd107d44179bb3d4fc61891172d11696609264589be6a0e6a43"
 
 [[package]]
 name = "bracket"
-version = "0.6.4"
+version = "0.7.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4c5ce751538fd09928ac667e40169615e10af436c6758e58490f0f8b10124f4d"
+checksum = "f37a05240eb2db9859a4fe9ecbd376c48d508c1d992ce7d8e4bfa0f718ea1ca3"
 dependencies = [
  "dyn-clone",
  "log",
@@ -55,7 +55,7 @@ dependencies = [
 
 [[package]]
 name = "bracket-fluent"
-version = "0.3.1"
+version = "0.3.2"
 dependencies = [
  "bracket",
  "fluent-templates",
