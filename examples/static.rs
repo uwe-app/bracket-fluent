@@ -1,12 +1,10 @@
 extern crate log;
 extern crate pretty_env_logger;
 
-use std::convert::TryFrom;
 use std::path::PathBuf;
 
 use bracket::{
     registry::Registry,
-    template::{Loader, Templates},
     Result,
 };
 
@@ -30,15 +28,13 @@ fn render() -> Result<String> {
         //"lang": "fr",
     });
 
-    let mut loader = Loader::new();
-    loader.load(PathBuf::from(name))?;
-
-    let templates = Templates::try_from(&loader)?;
-    let mut registry = Registry::from(templates);
-
+    let mut registry = Registry::new();
     registry
         .helpers_mut()
         .insert("fluent", Box::new(FluentHelper::new(Box::new(&*LOCALES))));
+
+    registry.load(PathBuf::from(name))?;
+    registry.build()?;
 
     registry.render(name, &data)
 }
