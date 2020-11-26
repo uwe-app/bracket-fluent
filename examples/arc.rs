@@ -35,8 +35,6 @@ fn render() -> Result<String> {
         .insert("fluent", Box::new(FluentHelper::new(Box::new(loader))));
 
     registry.load(PathBuf::from(name))?;
-    registry.build()?;
-
     registry.render(name, &data)
 }
 

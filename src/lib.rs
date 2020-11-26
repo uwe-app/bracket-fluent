@@ -1,4 +1,48 @@
-//! Helper for fluent language lookup.
+#![deny(missing_docs)]
+
+//! Helper for [fluent](https://www.projectfluent.org/) language lookup.
+//!
+//! The root data for the template must contain a `lang` field 
+//! with the identifier of the current language.
+//!
+//! Assuming a fluent language file in `locales/en/main.ftl` and the `lang` 
+//! field is set to `en`, using the contents:
+//!
+//! ```ignore
+//! welcome = Hello!
+//! greeting = Hello { $name }!
+//! block = { $var1 } { $var2 }
+//! ```
+//!
+//! We can resolve the message in a template using the fluent helper like this:
+//!
+//! ```ignore
+//! {{fluent "welcome"}}
+//! ```
+//!
+//! Pass variables using the helper hash parameters:
+//!
+//! ```ignore
+//! {{fluent "greeting" name="world"}}
+//! ```
+//!
+//! If you need to pass multi-line variables to a message use the `fluentparam` syntax 
+//! inside a block call:
+//!
+//! ```ignore
+//! {{#fluent "block"~}}
+//! {{#fluentparam "var1"~}}
+//! This is some multi-line content for 
+//! the first variable parameter named var1.
+//! {{/fluentparam}}
+//!
+//! {{#fluentparam "var2"}}
+//! Which is continued in another multi-line 
+//! paragraph using the variable named var2.
+//! {{~/fluentparam~}}
+//! {{/fluent}}
+//! ```
+//!
 use std::collections::HashMap;
 use std::sync::{Arc, RwLock};
 
@@ -17,6 +61,7 @@ use fluent_templates::Loader;
 
 static FLUENT_PARAM: &str = "fluentparam";
 
+/// Local helper for `{{#fluentparam}}` blocks.
 #[derive(Clone)]
 pub struct FluentParam {
     parameters: Arc<RwLock<HashMap<String, String>>>,
@@ -30,19 +75,14 @@ impl Helper for FluentParam {
         template: Option<&'render Node<'render>>,
     ) -> HelperValue {
         ctx.arity(1..1)?;
+        ctx.assert_block(template)?;
 
         let param_name = ctx.try_get(0, &[Type::String])?.as_str().unwrap();
 
-        if let Some(node) = template {
-            let content = rc.buffer(node)?;
-            let mut writer = self.parameters.write().unwrap();
-            writer.insert(param_name.to_string(), content);
-        } else {
-            return Err(HelperError::new(format!(
-                "Helper '{}' must be called as a block",
-                ctx.name()
-            )));
-        }
+        let node = template.unwrap();
+        let content = rc.buffer(node)?;
+        let mut writer = self.parameters.write().unwrap();
+        writer.insert(param_name.to_string(), content);
 
         Ok(None)
     }
