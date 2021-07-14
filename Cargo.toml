@@ -1,6 +1,6 @@
 [package]
 name = "bracket-fluent"
-version = "0.5.2"
+version = "0.5.3"
 description = "Fluent integration for the bracket template engine"
 authors = ["muji <muji@tmpfs.org>"]
 edition = "2018"
@@ -9,7 +9,7 @@ license = "MIT OR Apache-2.0"
 readme = "README.md"
 
 [dependencies]
-bracket = "^0.9.7"
+bracket = "^0.10.0"
 fluent-templates = "^0.5.16"
 serde_json = "^1.0"
 
