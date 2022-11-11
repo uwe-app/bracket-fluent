@@ -1,6 +1,6 @@
 [package]
 name = "bracket-fluent"
-version = "0.5.3"
+version = "0.5.4"
 description = "Fluent integration for the bracket template engine"
 authors = ["muji <muji@tmpfs.org>"]
 edition = "2018"
